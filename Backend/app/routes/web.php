@@ -1,16 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/tablas', function () {
+    $tablas = Schema::getTableListing();
 
-
-  Route::get('/prueba', function () {
-      return response()->json([
-          'aplicacion' => 'SabiTech app',
-          'estado' => 'OK',
-          'framework' => 'Laravel'
-      ]);
+    return response()->json($tablas);
   });

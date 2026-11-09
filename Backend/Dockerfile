@@ -9,6 +9,6 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN a2enmod rewrite
 
-COPY docker/apache/000-default.config /etc/apache2/sites-available/000-default.config
+COPY docker/apache/000-default.config /etc/apache2/sites-available/000-default.conf
 
 WORKDIR /var/www/html
