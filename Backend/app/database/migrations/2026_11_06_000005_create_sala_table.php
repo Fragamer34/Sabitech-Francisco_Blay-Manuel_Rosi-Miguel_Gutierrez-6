@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -10,9 +11,15 @@ return new class extends Migration
     {
         Schema::create('Sala', function (Blueprint $table) {
             $table->increments('idSala');
-            $table->string('nombreSala', 50);
-            $table->string('ubicacionSala', 50);
+            $table->string('nombreSala', 100);
+            $table->string('ubicacionSala', 150)->nullable();
             $table->integer('capacidadSala');
+            $table->text('equipamientoSala')->nullable();
+            $table->enum('estadoSala', [
+                'disponible',
+                'ocupada',
+                'mantenimiento'
+            ])->default('disponible');
         });
     }
 
