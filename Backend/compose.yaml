@@ -27,6 +27,7 @@ services:
       - API_DESKTOP=http://web:80
     volumes:
       - ../frontend:/app
+      - /app/node_modules
     depends_on:
       - web
 
