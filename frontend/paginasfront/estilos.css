@@ -1,0 +1,216 @@
+/* =========================================================
+   estilos.css — Hoja de estilos común (registro y reserva)
+   Paleta: azul + verde claro
+   ========================================================= */
+
+:root {
+  --azul: #1d5fb8;
+  --azul-oscuro: #144a94;
+  --azul-claro: #dbe9fb;
+  --verde-claro: #d8f3e2;
+  --verde-medio: #9fdcb7;
+  --verde-texto: #17603a;
+  --fondo: #eef8f2;
+  --texto: #1e293b;
+  --texto-suave: #5b6b7f;
+  --borde: #c5d6e8;
+  --error: #b42318;
+  --radio: 12px;
+  --sombra: 0 6px 24px rgba(29, 95, 184, .12);
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 1.5rem;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--texto);
+  background: linear-gradient(160deg, var(--fondo) 0%, var(--verde-claro) 100%);
+  min-height: 100vh;
+}
+
+body.centrado {
+  display: grid;
+  place-items: center;
+}
+
+h1, h2, h3 { color: var(--azul-oscuro); }
+h1 { margin-top: 0; font-size: 1.6rem; }
+h3 { margin-top: 0; }
+
+.muted { color: var(--texto-suave); font-size: .9rem; }
+
+/* ---------- Tarjeta ---------- */
+.card {
+  background: #fff;
+  border-radius: var(--radio);
+  padding: 1.5rem;
+  border-top: 5px solid var(--azul);
+  box-shadow: var(--sombra);
+}
+
+.form-card { width: min(430px, 100%); }
+
+/* ---------- Formularios ---------- */
+label {
+  display: block;
+  margin: 1rem 0 .3rem;
+  font-weight: 600;
+  font-size: .9rem;
+  color: var(--azul-oscuro);
+}
+
+input {
+  width: 100%;
+  padding: .65rem .75rem;
+  font-size: 1rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: #fbfefc;
+}
+
+input:focus {
+  outline: 3px solid var(--verde-medio);
+  border-color: var(--azul);
+}
+
+.error {
+  min-height: 1.1rem;
+  margin-top: .4rem;
+  font-size: .85rem;
+  color: var(--error);
+}
+
+/* ---------- Botones ---------- */
+.btn {
+  display: block;
+  width: 100%;
+  margin-top: 1.4rem;
+  padding: .8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--azul);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.btn:hover { background: var(--azul-oscuro); }
+.btn:disabled { background: #a9b8cc; cursor: not-allowed; }
+
+/* ---------- Reserva: disposición ---------- */
+.wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .wrap { grid-template-columns: 2fr 1fr; align-items: start; }
+}
+
+/* ---------- Calendario ---------- */
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .75rem;
+}
+
+.cal-head h2 { margin: 0; font-size: 1.2rem; text-transform: capitalize; }
+
+.cal-head button {
+  padding: .3rem .85rem;
+  font-size: 1.1rem;
+  color: var(--azul);
+  background: var(--verde-claro);
+  border: 1px solid var(--verde-medio);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cal-head button:hover { background: var(--verde-medio); }
+
+.grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+
+.dow {
+  padding: .3rem 0;
+  text-align: center;
+  font-weight: 600;
+  font-size: .8rem;
+  color: var(--texto-suave);
+}
+
+.day {
+  min-height: 95px;
+  padding: 4px;
+  font-size: .75rem;
+  overflow: hidden;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.day.empty { border: 0; background: transparent; }
+.day .num { margin-bottom: 2px; font-weight: 600; color: var(--azul-oscuro); }
+.day.today { border: 2px solid var(--azul); background: var(--azul-claro); }
+
+/* ---------- Charlas en el calendario ---------- */
+.charla {
+  display: block;
+  width: 100%;
+  margin-top: 3px;
+  padding: 3px 5px;
+  text-align: left;
+  font-size: .72rem;
+  color: #fff;
+  background: var(--azul);
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.charla small { display: block; opacity: .9; }
+.charla:hover { background: var(--azul-oscuro); }
+
+.charla.ACTUALIZADA { color: var(--verde-texto); background: var(--verde-medio); }
+.charla.ACTUALIZADA:hover { background: #86cfa4; }
+
+.charla.CANCELADA {
+  color: #6b7280;
+  background: #e5e7eb;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.charla.selected { outline: 3px solid var(--verde-texto); outline-offset: 1px; }
+
+/* ---------- Detalle de la charla ---------- */
+dl { margin: 0; }
+dt { margin-top: .8rem; font-weight: 600; font-size: .8rem; color: var(--azul); }
+dd { margin: 0; }
+
+/* ---------- Portada, enlaces y botón secundario ---------- */
+.portada { text-align: center; }
+
+.acciones { display: grid; gap: .8rem; margin-top: 1.5rem; }
+.acciones .btn { margin-top: 0; }
+
+a.btn { text-align: center; text-decoration: none; }
+
+.btn-secundario {
+  color: var(--verde-texto);
+  background: var(--verde-claro);
+  border: 2px solid var(--verde-medio);
+}
+
+.btn-secundario:hover { background: var(--verde-medio); }
+
+.pie { margin: 1rem 0 0; text-align: center; font-size: .9rem; color: var(--texto-suave); }
+.pie a, .portada a:not(.btn) { color: var(--azul); font-weight: 600; }

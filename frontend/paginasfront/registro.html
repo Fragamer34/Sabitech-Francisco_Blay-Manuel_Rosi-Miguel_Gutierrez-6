@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro de usuario</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body class="centrado">
+  <!-- Cambia action por tu ruta (en Laravel: {{ route('register') }} y añade @csrf) -->
+  <form class="card form-card" id="registro" action="/registro" method="POST" novalidate>
+    <h1>Crear cuenta</h1>
+
+    <label for="nombre">Nombre</label>
+    <input type="text" id="nombre" name="nombre" maxlength="50" required autocomplete="given-name">
+
+    <label for="apellidos">Apellidos</label>
+    <input type="text" id="apellidos" name="apellidos" maxlength="100" required autocomplete="family-name">
+
+    <label for="email">Correo electrónico</label>
+    <input type="email" id="email" name="email" required autocomplete="email">
+
+    <label for="password">Contraseña</label>
+    <input type="password" id="password" name="password" minlength="8" required autocomplete="new-password">
+
+    <label for="password_confirmation">Confirmar contraseña</label>
+    <input type="password" id="password_confirmation" name="password_confirmation" required autocomplete="new-password">
+    <div class="error" id="error"></div>
+
+    <button class="btn" type="submit">Registrarme</button>
+
+    <p class="pie">¿Ya tienes cuenta? <a href="login.html">Iniciar sesión</a></p>
+    <p class="pie"><a href="inicio.html">← Volver al inicio</a></p>
+  </form>
+
+  <script>
+    const form = document.getElementById('registro');
+    const error = document.getElementById('error');
+
+    form.addEventListener('submit', (e) => {
+      error.textContent = '';
+      const pass = form.password.value;
+
+      if (!form.checkValidity()) {
+        e.preventDefault();
+        error.textContent = 'Revisa los campos: todos son obligatorios y la contraseña debe tener al menos 8 caracteres.';
+        return;
+      }
+      if (pass !== form.password_confirmation.value) {
+        e.preventDefault();
+        error.textContent = 'Las contraseñas no coinciden.';
+      }
+    });
+  </script>
+</body>
+</html>

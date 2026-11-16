@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iniciar sesión</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body class="centrado">
+  <!-- Cambia action por tu ruta (en Laravel: {{ route('login') }} y añade @csrf) -->
+  <form class="card form-card" id="login" action="/login" method="POST" novalidate>
+    <h1>Iniciar sesión</h1>
+
+    <label for="email">Correo electrónico</label>
+    <input type="email" id="email" name="email" required autocomplete="email">
+
+    <label for="password">Contraseña</label>
+    <input type="password" id="password" name="password" required autocomplete="current-password">
+    <div class="error" id="error"></div>
+
+    <button class="btn" type="submit">Entrar</button>
+
+    <p class="pie">¿No tienes cuenta? <a href="registro.html">Crear cuenta</a></p>
+    <p class="pie"><a href="inicio.html">← Volver al inicio</a></p>
+  </form>
+
+  <script>
+    const form = document.getElementById('login');
+    const error = document.getElementById('error');
+
+    form.addEventListener('submit', (e) => {
+      error.textContent = '';
+      if (!form.checkValidity()) {
+        e.preventDefault();
+        error.textContent = 'Introduce un correo electrónico válido y tu contraseña.';
+      }
+    });
+  </script>
+</body>
+</html>
