@@ -18,5 +18,17 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  frontend:
+    container_name: frontend
+    build: ../frontend
+    ports:
+      - "127.0.0.1:5173:5173"
+    environment:
+      - API_DESKTOP=http://web:80
+    volumes:
+      - ../frontend:/app
+    depends_on:
+      - web
+
 volumes:
   mysql_data:
