@@ -21,15 +21,6 @@ use App\Http\Controllers\Api\UsuarioController;
 use App\Http\Controllers\Api\UsuarioRolController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API de Sabitech (prefijo automático: /api)
-|--------------------------------------------------------------------------
-| Roles usados (nombreRol tal y como los crea la migración de Rol):
-|   Administrador general
-|   Gestor de charlas y reservas
-|   Gestor de asistencias y notificaciones
-*/
 
 // ---------- Acceso / identificación ----------
 Route::prefix('auth')->group(function () {
