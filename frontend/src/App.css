@@ -1,184 +1,308 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
+/* =========================================================
+   estilos.css — Hoja de estilos común (registro y reserva)
+   Paleta: azul + verde claro
+   ========================================================= */
 
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+:root {
+  --azul: #1d5fb8;
+  --azul-oscuro: #144a94;
+  --azul-claro: #dbe9fb;
+  --verde-claro: #d8f3e2;
+  --verde-medio: #9fdcb7;
+  --verde-texto: #17603a;
+  --fondo: #eef8f2;
+  --texto: #1e293b;
+  --texto-suave: #5b6b7f;
+  --borde: #c5d6e8;
+  --error: #b42318;
+  --radio: 12px;
+  --sombra: 0 6px 24px rgba(29, 95, 184, 0.12);
 }
 
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+/* ---------- Base ---------- */
+* {
+  box-sizing: border-box;
 }
 
-#center {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  place-content: center;
+body {
+  margin: 0;
+  padding: 1.5rem;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  color: var(--texto);
+  background: linear-gradient(160deg, var(--fondo) 0%, var(--verde-claro) 100%);
+  min-height: 100vh;
+}
+
+body.centrado {
+  display: grid;
   place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
 }
 
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+h1,
+h2,
+h3 {
+  color: var(--azul-oscuro);
+}
+h1 {
+  margin-top: 0;
+  font-size: 1.6rem;
+}
+h3 {
+  margin-top: 0;
 }
 
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
+.muted {
+  color: var(--texto-suave);
+  font-size: 0.9rem;
 }
 
-#next-steps ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
+/* ---------- Tarjeta ---------- */
+.card {
+  background: #fff;
+  border-radius: var(--radio);
+  padding: 1.5rem;
+  border-top: 5px solid var(--azul);
+  box-shadow: var(--sombra);
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+.form-card {
+  width: min(430px, 100%);
 }
 
-.ticks {
-  position: relative;
+/* ---------- Formularios ---------- */
+label {
+  display: block;
+  margin: 1rem 0 0.3rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--azul-oscuro);
+}
+
+input {
   width: 100%;
+  padding: 0.65rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: #fbfefc;
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+input:focus {
+  outline: 3px solid var(--verde-medio);
+  border-color: var(--azul);
+}
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
+.error {
+  min-height: 1.1rem;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--error);
+}
+
+/* ---------- Botones ---------- */
+.btn {
+  display: block;
+  width: 100%;
+  margin-top: 1.4rem;
+  padding: 0.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--azul);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn:hover {
+  background: var(--azul-oscuro);
+}
+.btn:disabled {
+  background: #a9b8cc;
+  cursor: not-allowed;
+}
+
+/* ---------- Reserva: disposición ---------- */
+.wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .wrap {
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
   }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+}
+
+/* ---------- Calendario ---------- */
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.cal-head h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  text-transform: capitalize;
+}
+
+.cal-head button {
+  padding: 0.3rem 0.85rem;
+  font-size: 1.1rem;
+  color: var(--azul);
+  background: var(--verde-claro);
+  border: 1px solid var(--verde-medio);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cal-head button:hover {
+  background: var(--verde-medio);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.dow {
+  padding: 0.3rem 0;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.day {
+  min-height: 95px;
+  padding: 4px;
+  font-size: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.day.empty {
+  border: 0;
+  background: transparent;
+}
+.day .num {
+  margin-bottom: 2px;
+  font-weight: 600;
+  color: var(--azul-oscuro);
+}
+.day.today {
+  border: 2px solid var(--azul);
+  background: var(--azul-claro);
+}
+
+/* ---------- Charlas en el calendario ---------- */
+.charla {
+  display: block;
+  width: 100%;
+  margin-top: 3px;
+  padding: 3px 5px;
+  text-align: left;
+  font-size: 0.72rem;
+  color: #fff;
+  background: var(--azul);
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.charla small {
+  display: block;
+  opacity: 0.9;
+}
+.charla:hover {
+  background: var(--azul-oscuro);
+}
+
+.charla.ACTUALIZADA {
+  color: var(--verde-texto);
+  background: var(--verde-medio);
+}
+.charla.ACTUALIZADA:hover {
+  background: #86cfa4;
+}
+
+.charla.CANCELADA {
+  color: #6b7280;
+  background: #e5e7eb;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.charla.selected {
+  outline: 3px solid var(--verde-texto);
+  outline-offset: 1px;
+}
+
+/* ---------- Detalle de la charla ---------- */
+dl {
+  margin: 0;
+}
+dt {
+  margin-top: 0.8rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--azul);
+}
+dd {
+  margin: 0;
+}
+
+/* ---------- Portada, enlaces y botón secundario ---------- */
+.portada {
+  text-align: center;
+}
+
+.acciones {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+.acciones .btn {
+  margin-top: 0;
+}
+
+a.btn {
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-secundario {
+  color: var(--verde-texto);
+  background: var(--verde-claro);
+  border: 2px solid var(--verde-medio);
+}
+
+.btn-secundario:hover {
+  background: var(--verde-medio);
+}
+
+.pie {
+  margin: 1rem 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+.pie a,
+.portada a:not(.btn) {
+  color: var(--azul);
+  font-weight: 600;
 }
