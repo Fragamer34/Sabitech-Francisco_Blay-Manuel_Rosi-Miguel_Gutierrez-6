@@ -1,10 +1,3 @@
-->withRouting(
-    web: __DIR__.'/../routes/web.php',
-    api: __DIR__.'/../routes/api.php',
-    commands: __DIR__.'/../routes/console.php',
-    health: '/up',
-)
-
 <?php
 
 use App\Http\Controllers\Api\AsistenciaController;
@@ -26,11 +19,6 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('auth')->group(function () {
     Route::post('registro', [AuthController::class, 'registro']);
     Route::post('login', [AuthController::class, 'login']);
-
-    Route::middleware('auth.token')->group(function () {
-        Route::post('logout', [AuthController::class, 'logout']);
-        Route::get('me', [AuthController::class, 'me']);
-    });
 });
 
 // ---------- Catálogo público ----------

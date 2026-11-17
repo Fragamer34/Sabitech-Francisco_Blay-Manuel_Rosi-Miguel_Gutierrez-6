@@ -31,6 +31,7 @@ services:
       - /app/node_modules # conserva los node_modules del contenedor
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - VITE_PROXY_TARGET=http://web:80
     depends_on:
       - web
 
