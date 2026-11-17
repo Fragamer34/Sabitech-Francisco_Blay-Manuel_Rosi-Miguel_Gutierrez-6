@@ -7,7 +7,6 @@ export class Charla {
     horaInicioCharla,
     horaFinCharla,
     estadoCharla,
-    asistenciaCharla,
     idUsuario,
     idSala,
   }) {
@@ -18,7 +17,6 @@ export class Charla {
     this.horaInicioCharla = horaInicioCharla;
     this.horaFinCharla = horaFinCharla;
     this.estadoCharla = estadoCharla;
-    this.asistenciaCharla = asistenciaCharla;
     this.idUsuario = idUsuario;
     this.idSala = idSala;
   }
@@ -32,7 +30,6 @@ export class Charla {
       horaInicioCharla: json.horaInicioCharla,
       horaFinCharla: json.horaFinCharla,
       estadoCharla: json.estadoCharla,
-      asistenciaCharla: json.asistenciaCharla,
       idUsuario: json.idUsuario,
       idSala: json.idSala,
     });
@@ -47,7 +44,6 @@ export class Charla {
       horaInicioCharla: this.horaInicioCharla,
       horaFinCharla: this.horaFinCharla,
       estadoCharla: this.estadoCharla,
-      asistenciaCharla: this.asistenciaCharla,
       idUsuario: this.idUsuario,
       idSala: this.idSala,
     };
