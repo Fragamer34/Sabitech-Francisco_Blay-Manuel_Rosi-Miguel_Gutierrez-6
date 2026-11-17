@@ -3,82 +3,89 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Charla;
 use App\Models\Reserva;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
-class ReservaController extends Controller
+/**
+ * Reservas del usuario identificado. El usuario sale del token, nunca del cuerpo de la petición.
+ */
+class MisReservasController extends Controller
 {
     /**
-     * Listado de reservas (paginado).
+     * Listado de mis reservas (paginado).
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
-        $reservas = Reserva::orderBy('fechaReserva', 'desc')->paginate(10);
+        $reservas = Reserva::with(['charla.sala', 'charla.ponente'])
+            ->where('idUsuario', $request->user()->idUsuario)
+            ->orderByDesc('fechaReserva')
+            ->paginate(10);
 
         return response()->json($reservas);
     }
 
     /**
-     * Crea una reserva.
+     * Reserva una charla para el usuario identificado.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $reserva = Reserva::create($this->validar($request));
-
-        return response()->json($reserva, 201);
-    }
-
-    /**
-     * Muestra una reserva.
-     */
-    public function show(Reserva $reserva)
-    {
-        return response()->json($reserva);
-    }
-
-    /**
-     * Actualiza una reserva.
-     */
-    public function update(Request $request, Reserva $reserva)
-    {
-        $reserva->update($this->validar($request, $reserva));
-
-        return response()->json($reserva);
-    }
-
-    /**
-     * Elimina una reserva.
-     */
-    public function destroy(Reserva $reserva)
-    {
-        $reserva->delete();
-
-        return response()->noContent();
-    }
-
-    /**
-     * Reglas de validación compartidas por store y update.
-     */
-    private function validar(Request $request, ?Reserva $reserva = null): array
-    {
-        return $request->validate([
-            'fechaReserva'      => 'sometimes|date',
-            'estadoReserva'     => ['sometimes', Rule::in(['confirmada', 'cancelada'])],
-            'referenciaReserva' => [
-                'required', 'string', 'max:100',
-                Rule::unique('Reserva', 'referenciaReserva')->ignore($reserva?->idReserva, 'idReserva'),
-            ],
-
-            // Claves foráneas
-            'idUsuario'         => 'required|integer|exists:Usuario,idUsuario',
-            'idCharla'          => [
-                'required', 'integer', 'exists:Charla,idCharla',
-                // Un usuario solo puede reservar una vez la misma charla
-                Rule::unique('Reserva', 'idCharla')
-                    ->where('idUsuario', $request->input('idUsuario'))
-                    ->ignore($reserva?->idReserva, 'idReserva'),
-            ],
+        $datos = $request->validate([
+            'idCharla' => ['required', 'integer', 'exists:Charla,idCharla'],
         ]);
+
+        $idUsuario = $request->user()->idUsuario;
+
+        return DB::transaction(function () use ($idUsuario, $datos) {
+            // Bloquea la fila de la charla: dos reservas simultáneas no pueden superar el aforo
+            $charla = Charla::whereKey($datos['idCharla'])->lockForUpdate()->firstOrFail();
+
+            if ($charla->estadoCharla !== 'programada') {
+                return response()->json(['message' => 'Esta charla no admite reservas.'], 422);
+            }
+
+            if ($charla->fechaCharla->lt(Carbon::today())) {
+                return response()->json(['message' => 'La charla ya ha pasado.'], 422);
+            }
+
+            $yaReservada = Reserva::where('idUsuario', $idUsuario)
+                ->where('idCharla', $charla->idCharla)
+                ->exists();
+
+            if ($yaReservada) {
+                return response()->json(['message' => 'Ya tienes una reserva para esta charla.'], 409);
+            }
+
+            $ocupadas = Reserva::where('idCharla', $charla->idCharla)
+                ->where('estadoReserva', 'confirmada')
+                ->count();
+
+            if ($ocupadas >= $charla->aforoCharla) {
+                return response()->json(['message' => 'No quedan plazas libres para esta charla.'], 409);
+            }
+
+            $reserva = Reserva::create([
+                'idUsuario'         => $idUsuario,
+                'idCharla'          => $charla->idCharla,
+                'fechaReserva'      => now(),
+                'estadoReserva'     => 'confirmada',
+                'referenciaReserva' => $this->generarReferencia(),
+            ]);
+
+            return response()->json($reserva->load(['charla.sala', 'charla.ponente']), 201);
+        });
+    }
+
+    private function generarReferencia(): string
+    {
+        do {
+            $referencia = 'RES-'.strtoupper(Str::random(8));
+        } while (Reserva::where('referenciaReserva', $referencia)->exists());
+
+        return $referencia;
     }
 }

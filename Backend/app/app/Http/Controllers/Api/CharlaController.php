@@ -4,25 +4,44 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Charla;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class CharlaController extends Controller
 {
     /**
-     * Listado de charlas (paginado).
+     * Catálogo público: charlas programadas, con ponente, sala y plazas libres (paginado).
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        $charlas = Charla::orderBy('fechaCharla', 'desc')->paginate(10);
+        $charlas = Charla::with(['ponente', 'sala'])
+            ->conReservasConfirmadas()
+            ->where('estadoCharla', 'programada')
+            ->orderBy('fechaCharla')
+            ->orderBy('horaInicioCharla')
+            ->paginate(10);
 
-        return response()->json($charlas);
+        return response()->json($charlas->through(fn (Charla $charla) => $this->formato($charla)));
     }
 
     /**
-     * Crea una charla.
+     * Detalle público de una charla programada, con plazas libres.
      */
-    public function store(Request $request)
+    public function show(Charla $charla): JsonResponse
+    {
+        abort_if($charla->estadoCharla !== 'programada', 404, 'La charla no existe.');
+
+        $charla->load(['ponente', 'sala'])
+            ->loadCount(['reservas as reservasConfirmadas' => fn ($r) => $r->where('estadoReserva', 'confirmada')]);
+
+        return response()->json($this->formato($charla));
+    }
+
+    /**
+     * Crea una charla (solo gestión).
+     */
+    public function store(Request $request): JsonResponse
     {
         $charla = Charla::create($this->validar($request));
 
@@ -30,17 +49,9 @@ class CharlaController extends Controller
     }
 
     /**
-     * Muestra una charla.
+     * Actualiza una charla (solo gestión).
      */
-    public function show(Charla $charla)
-    {
-        return response()->json($charla);
-    }
-
-    /**
-     * Actualiza una charla.
-     */
-    public function update(Request $request, Charla $charla)
+    public function update(Request $request, Charla $charla): JsonResponse
     {
         $charla->update($this->validar($request));
 
@@ -48,9 +59,9 @@ class CharlaController extends Controller
     }
 
     /**
-     * Elimina una charla.
+     * Elimina una charla (solo gestión).
      */
-    public function destroy(Charla $charla)
+    public function destroy(Charla $charla): \Illuminate\Http\Response
     {
         $charla->delete();
 
@@ -58,22 +69,30 @@ class CharlaController extends Controller
     }
 
     /**
-     * Reglas de validación compartidas por store y update.
+     * Charla + plazas libres en el mismo formato de respuesta.
+     */
+    private function formato(Charla $charla): array
+    {
+        return array_merge($charla->toArray(), ['plazasLibres' => $charla->plazasLibres()]);
+    }
+
+    /**
+     * Reglas de validación compartidas por store y update (según la migración de Charla).
      */
     private function validar(Request $request): array
     {
         return $request->validate([
-            'nombreCharla'      => 'required|string|max:50',
-            'descripcionCharla' => 'required|string',
-            'fechaCharla'       => 'required|date',
-            'horaInicioCharla'  => 'required|date_format:H:i',
-            'horaFinCharla'     => 'required|date_format:H:i|after:horaInicioCharla',
-            'estadoCharla'      => ['sometimes', Rule::in(['PROGRAMADA', 'ACTUALIZADA', 'CANCELADA'])],
-            'asistenciaCharla'  => ['sometimes', Rule::in(['HA ASISTIDO', 'NO HA ASISTIDO', 'ASISTENCIA NO REVISADA'])],
+            'tituloCharla'     => 'required|string|max:200',
+            'contenidoCharla'  => 'nullable|string',
+            'fechaCharla'      => 'required|date',
+            'horaInicioCharla' => 'required|date_format:H:i',
+            'horaFinCharla'    => 'required|date_format:H:i|after:horaInicioCharla',
+            'aforoCharla'      => 'required|integer|min:1',
+            'estadoCharla'     => ['sometimes', Rule::in(['programada', 'cancelada', 'finalizada'])],
 
             // Claves foráneas
-            'idUsuario'         => 'required|integer|exists:Usuario,idUsuario',
-            'idSala'            => 'required|integer|exists:Sala,idSala',
+            'idPonente'        => 'required|integer|exists:Ponente,idPonente',
+            'idSala'           => 'required|integer|exists:Sala,idSala',
         ]);
     }
 }

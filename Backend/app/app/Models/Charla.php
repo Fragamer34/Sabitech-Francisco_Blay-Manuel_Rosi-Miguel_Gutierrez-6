@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -50,5 +51,26 @@ class Charla extends Model
     public function reservas(): HasMany
     {
         return $this->hasMany(Reserva::class, 'idCharla', 'idCharla');
+    }
+
+    /**
+     * Añade el número de reservas confirmadas (alias reservasConfirmadas) para calcular plazas.
+     */
+    public function scopeConReservasConfirmadas(Builder $query): Builder
+    {
+        return $query->withCount([
+            'reservas as reservasConfirmadas' => fn (Builder $r) => $r->where('estadoReserva', 'confirmada'),
+        ]);
+    }
+
+    /**
+     * Plazas libres = aforo − reservas confirmadas (nunca negativo).
+     */
+    public function plazasLibres(): int
+    {
+        $ocupadas = $this->reservasConfirmadas
+            ?? $this->reservas()->where('estadoReserva', 'confirmada')->count();
+
+        return max(0, $this->aforoCharla - (int) $ocupadas);
     }
 }

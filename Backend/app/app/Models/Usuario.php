@@ -46,11 +46,24 @@ class Usuario extends Model
         return $this->hasMany(Notificacion::class, 'idUsuario', 'idUsuario');
     }
 
+    public function tokensAcceso(): HasMany
+    {
+        return $this->hasMany(TokenAcceso::class, 'idUsuario', 'idUsuario');
+    }
+
     /**
      * Asistencias que este usuario ha validado (como validador).
      */
     public function asistenciasValidadas(): HasMany
     {
         return $this->hasMany(Asistencia::class, 'idUsuarioValidador', 'idUsuario');
+    }
+
+    /**
+     * Indica si el usuario tiene alguno de los roles (por nombreRol).
+     */
+    public function tieneRol(string ...$nombres): bool
+    {
+        return $this->roles()->whereIn('nombreRol', $nombres)->exists();
     }
 }
