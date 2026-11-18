@@ -1,0 +1,39 @@
+name: sabitech-despliegue
+
+services:
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./app:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: sabitech
+      MYSQL_USER: sabitech_user
+      MYSQL_PASSWORD: Aula_Sabiteck_2026
+      MYSQL_ROOT_PASSWORD: Aula_Root_2026
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  frontend:
+    build:
+      context: ../Frontend # carpeta de tu proyecto React (ajusta el nombre)
+      target: dev # cambia a "prod" para servirlo con Nginx
+    ports:
+      - "127.0.0.1:5173:5173" # en prod: "127.0.0.1:3000:80"
+    volumes:
+      - ../Frontend:/app
+      - /app/node_modules # conserva los node_modules del contenedor
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_PROXY_TARGET=http://web:80
+    depends_on:
+      - web
+
+volumes:
+  mysql_data:
