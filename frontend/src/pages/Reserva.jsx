@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { estaLogueado, cerrarSesion } from '../api/authApi';
 
 /* ---- DATOS DE EJEMPLO ----
    TODO: sustitúyelos por las charlas de tu base de datos, por ejemplo con
@@ -28,7 +29,7 @@ export default function Reserva() {
   const [mensaje, setMensaje] = useState('');
 
   // ¿Hay un usuario con sesión iniciada? (si no, es invitado)
-  const [logueado, setLogueado] = useState(() => Boolean(localStorage.getItem('token')));
+  const [logueado, setLogueado] = useState(() => estaLogueado());
 
   // Reservas del usuario: { idCharla: estado de asistencia }
   // Estados: 'ASISTENCIA NO REVISADA' (recién reservada) | 'HA ASISTIDO' (confirmada)
@@ -39,6 +40,8 @@ export default function Reserva() {
   const mes = vista.getMonth();
   const huecos = (new Date(anio, mes, 1).getDay() + 6) % 7; // lunes = 0
   const totalDias = new Date(anio, mes + 1, 0).getDate();
+  const prefijoMes = `${anio}-${pad(mes + 1)}`;
+  const hayCharlasMes = charlas.some((c) => c.fechaCharla.startsWith(prefijoMes));
   const hoy = new Date();
   const hoyStr = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())}`;
 
@@ -68,7 +71,7 @@ export default function Reserva() {
   };
 
   const salir = () => {
-    localStorage.removeItem('token'); // TODO: o lo que uses para guardar la sesión
+    cerrarSesion();
     setLogueado(false);
     setReservadas({});
     navigate('/');
@@ -105,11 +108,12 @@ export default function Reserva() {
             {Array.from({ length: totalDias }, (_, i) => {
               const dia = i + 1;
               const fecha = `${anio}-${pad(mes + 1)}-${pad(dia)}`;
+              const delDia = charlasDelDia(fecha);
               return (
-                <div key={fecha} className={`day${fecha === hoyStr ? ' today' : ''}`}>
+                <div key={fecha} className={`day${fecha === hoyStr ? ' today' : ''}${delDia.length === 0 ? ' sin-charlas' : ''}`}>
                   <div className="num">{dia}</div>
 
-                  {charlasDelDia(fecha).map((c) => (
+                  {delDia.map((c) => (
                     <button
                       key={c.idCharla}
                       type="button"
@@ -125,6 +129,8 @@ export default function Reserva() {
               );
             })}
           </div>
+
+          {!hayCharlasMes && <p className="muted vacio">No hay charlas este mes.</p>}
         </section>
 
         {/* ---------- Detalle y reserva ---------- */}
