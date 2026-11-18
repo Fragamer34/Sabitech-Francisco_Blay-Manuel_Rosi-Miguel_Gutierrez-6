@@ -22,14 +22,14 @@ Route::prefix('auth')->group(function () {
 });
 
 // ---------- Catálogo público ----------
+Route::get('calendario', [CharlaController::class, 'calendario']);
 Route::get('charlas', [CharlaController::class, 'index']);
 Route::get('charlas/{charla}', [CharlaController::class, 'show']);
 
-// ---------- Asistente identificado ----------
-Route::middleware('auth.token')->group(function () {
-    Route::get('mis-reservas', [MisReservasController::class, 'index']);
-    Route::post('mis-reservas', [MisReservasController::class, 'store']);
-});
+// ---------- Reservas y asistencia del usuario (sin token: se envía idUsuario) ----------
+Route::get('mis-reservas', [MisReservasController::class, 'index']);
+Route::post('mis-reservas', [MisReservasController::class, 'store']);
+Route::post('mis-reservas/{reserva}/asistencia', [MisReservasController::class, 'confirmarAsistencia']);
 
 // ---------- Gestión de charlas, salas, ponentes y reservas ----------
 Route::middleware(['auth.token', 'rol:Administrador general,Gestor de charlas y reservas'])->group(function () {

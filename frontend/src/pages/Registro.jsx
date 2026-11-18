@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { registrar } from '../api/authApi';
 
 export default function Registro() {
   const navigate = useNavigate();
@@ -7,11 +8,12 @@ export default function Registro() {
     nombre: '', apellidos: '', email: '', password: '', password_confirmation: '',
   });
   const [error, setError] = useState('');
+  const [cargando, setCargando] = useState(false);
 
   // Un solo manejador para todos los campos (usa el atributo name del input)
   const cambiar = (e) => setDatos({ ...datos, [e.target.name]: e.target.value });
 
-  const enviar = (e) => {
+  const enviar = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -28,10 +30,22 @@ export default function Registro() {
       return;
     }
 
-    // TODO: aquí va la llamada a tu backend con "datos"
-    // Si va bien: navigate('/login');
-    console.log('Registro:', datos);
-    navigate('/login');
+    setCargando(true);
+    try {
+      await registrar(datos);
+      navigate('/login', { state: { registrado: true } });
+    } catch (err) {
+      const erroresCampo = err.body?.errors;
+      if (erroresCampo?.emailUsuario) {
+        setError('Ya existe una cuenta con ese correo electrónico.');
+      } else if (err.status === 422 && erroresCampo) {
+        setError('Revisa los datos introducidos: alguno no es válido.');
+      } else {
+        setError(err.message);
+      }
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
@@ -61,7 +75,9 @@ export default function Registro() {
 
       <div className="error">{error}</div>
 
-      <button className="btn" type="submit">Registrarme</button>
+      <button className="btn" type="submit" disabled={cargando}>
+        {cargando ? 'Creando cuenta…' : 'Registrarme'}
+      </button>
 
       <p className="pie">¿Ya tienes cuenta? <Link to="/login">Iniciar sesión</Link></p>
       <p className="pie"><Link to="/">← Volver al inicio</Link></p>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Charla;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -23,6 +24,34 @@ class CharlaController extends Controller
             ->paginate(10);
 
         return response()->json($charlas->through(fn (Charla $charla) => $this->formato($charla)));
+    }
+
+    /**
+     * Calendario público: todas las charlas (programadas y canceladas) de un mes.
+     * Uso: GET /api/calendario?mes=2026-11
+     */
+    public function calendario(Request $request): JsonResponse
+    {
+        $datos = $request->validate([
+            'mes' => ['required', 'date_format:Y-m'],
+        ]);
+
+        // El "!" pone el día a 1: sin él, el día 31 desbordaría meses de 30 días
+        $inicio = Carbon::createFromFormat('!Y-m', $datos['mes']);
+        $fin = $inicio->copy()->endOfMonth();
+
+        $charlas = Charla::with([
+                'ponente:idPonente,nombrePonente,apellidosPonente',
+                'sala:idSala,nombreSala,ubicacionSala',
+            ])
+            ->conReservasConfirmadas()
+            ->whereIn('estadoCharla', ['programada', 'cancelada'])
+            ->whereBetween('fechaCharla', [$inicio->toDateString(), $fin->toDateString()])
+            ->orderBy('fechaCharla')
+            ->orderBy('horaInicioCharla')
+            ->get();
+
+        return response()->json($charlas->map(fn (Charla $charla) => $this->formato($charla))->values());
     }
 
     /**

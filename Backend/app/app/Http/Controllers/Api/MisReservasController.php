@@ -3,42 +3,59 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asistencia;
 use App\Models\Charla;
 use App\Models\Reserva;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 /**
- * Reservas del usuario identificado. El usuario sale del token, nunca del cuerpo de la petición.
+ * Reservas y asistencia de un usuario. No usa tokens: el frontend envía el idUsuario
+ * del usuario que ha iniciado sesión y aquí solo se comprueba que ese usuario existe.
  */
 class MisReservasController extends Controller
 {
     /**
-     * Listado de mis reservas (paginado).
+     * Reservas confirmadas del usuario, indicando si ya ha confirmado su asistencia.
+     * Uso: GET /api/mis-reservas?idUsuario=1
      */
     public function index(Request $request): JsonResponse
     {
-        $reservas = Reserva::with(['charla.sala', 'charla.ponente'])
-            ->where('idUsuario', $request->user()->idUsuario)
+        $datos = $request->validate([
+            'idUsuario' => ['required', 'integer', 'exists:Usuario,idUsuario'],
+        ]);
+
+        $reservas = Reserva::with('asistencia')
+            ->where('idUsuario', $datos['idUsuario'])
+            ->where('estadoReserva', 'confirmada')
             ->orderByDesc('fechaReserva')
-            ->paginate(10);
+            ->get()
+            ->map(fn (Reserva $reserva) => [
+                'idReserva'            => $reserva->idReserva,
+                'idCharla'             => $reserva->idCharla,
+                'referenciaReserva'    => $reserva->referenciaReserva,
+                'fechaReserva'         => $reserva->fechaReserva?->format('Y-m-d H:i:s'),
+                'asistenciaConfirmada' => $reserva->asistencia !== null,
+            ]);
 
         return response()->json($reservas);
     }
 
     /**
-     * Reserva una charla para el usuario identificado.
+     * Reserva una charla para el usuario.
+     * Uso: POST /api/mis-reservas  { idUsuario, idCharla }
      */
     public function store(Request $request): JsonResponse
     {
         $datos = $request->validate([
-            'idCharla' => ['required', 'integer', 'exists:Charla,idCharla'],
+            'idUsuario' => ['required', 'integer', 'exists:Usuario,idUsuario'],
+            'idCharla'  => ['required', 'integer', 'exists:Charla,idCharla'],
         ]);
 
-        $idUsuario = $request->user()->idUsuario;
+        $idUsuario = (int) $datos['idUsuario'];
 
         return DB::transaction(function () use ($idUsuario, $datos) {
             // Bloquea la fila de la charla: dos reservas simultáneas no pueden superar el aforo
@@ -78,6 +95,33 @@ class MisReservasController extends Controller
 
             return response()->json($reserva->load(['charla.sala', 'charla.ponente']), 201);
         });
+    }
+
+    /**
+     * Confirma la asistencia del usuario a una charla que ha reservado (guarda una fila en Asistencia).
+     * Uso: POST /api/mis-reservas/{idReserva}/asistencia  { idUsuario }
+     */
+    public function confirmarAsistencia(Request $request, Reserva $reserva): JsonResponse
+    {
+        $datos = $request->validate([
+            'idUsuario' => ['required', 'integer', 'exists:Usuario,idUsuario'],
+        ]);
+
+        if ((int) $reserva->idUsuario !== (int) $datos['idUsuario']) {
+            return response()->json(['message' => 'Esta reserva no es tuya.'], 403);
+        }
+
+        if ($reserva->estadoReserva !== 'confirmada') {
+            return response()->json(['message' => 'La reserva no está confirmada.'], 422);
+        }
+
+        // Una reserva solo puede tener una asistencia: si ya existe, se devuelve la misma
+        $asistencia = Asistencia::firstOrCreate(
+            ['idReserva' => $reserva->idReserva],
+            ['fechaHoraEntrada' => now()],
+        );
+
+        return response()->json($asistencia, $asistencia->wasRecentlyCreated ? 201 : 200);
     }
 
     private function generarReferencia(): string
