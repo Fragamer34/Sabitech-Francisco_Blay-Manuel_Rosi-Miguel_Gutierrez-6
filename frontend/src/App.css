@@ -442,3 +442,105 @@ dd {
     font-size: 0.8rem;
   }
 }
+
+/* ---------- Inicio: cabecera y listado de charlas ---------- */
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  max-width: 1000px;
+  margin: 0 auto 1.5rem;
+}
+.cabecera-logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--azul-oscuro);
+  text-decoration: none;
+}
+.cabecera-nav {
+  display: flex;
+  gap: 0.6rem;
+}
+.cabecera-nav .btn {
+  width: auto;
+  margin-top: 0;
+  padding: 0.55rem 1.1rem;
+  text-decoration: none;
+}
+
+.wrap-inicio {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.wrap-inicio h1 {
+  margin-bottom: 0.4rem;
+}
+
+.lista-charlas {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+.charla-card {
+  display: flex;
+  flex-direction: column;
+}
+.charla-card h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.charla-card p {
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+}
+.charla-card dl {
+  margin-top: 0.4rem;
+}
+.charla-card .btn {
+  margin-top: auto;
+}
+.charla-card.CANCELADA {
+  opacity: 0.7;
+}
+.charla-card-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.estado {
+  flex-shrink: 0;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--verde-texto);
+  background: var(--verde-claro);
+  border-radius: 999px;
+}
+.estado.ACTUALIZADA {
+  color: var(--azul-oscuro);
+  background: var(--azul-claro);
+}
+.estado.CANCELADA {
+  color: #6b7280;
+  background: #e5e7eb;
+}
+
+@media (max-width: 640px) {
+  .cabecera-logo {
+    font-size: 1.3rem;
+  }
+  .cabecera-nav .btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  .lista-charlas {
+    grid-template-columns: 1fr;
+  }
+}

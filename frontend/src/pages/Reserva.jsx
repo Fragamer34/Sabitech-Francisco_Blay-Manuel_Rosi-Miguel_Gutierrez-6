@@ -1,20 +1,7 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { estaLogueado, cerrarSesion } from '../api/authApi';
-
-/* ---- DATOS DE EJEMPLO ----
-   TODO: sustitúyelos por las charlas de tu base de datos, por ejemplo con
-   useEffect + fetch (o la función de src/api/charlaApi.js) y useState([]). */
-const CHARLAS = [
-  { idCharla: 1, nombreCharla: 'Introducción a Laravel', descripcionCharla: 'Primeros pasos con rutas, controladores y Blade.',
-    fechaCharla: '2026-11-18', horaInicioCharla: '10:00:00', horaFinCharla: '11:30:00', estadoCharla: 'PROGRAMADA', idSala: 1 },
-  { idCharla: 2, nombreCharla: 'MySQL avanzado', descripcionCharla: 'Índices, joins y optimización de consultas.',
-    fechaCharla: '2026-11-18', horaInicioCharla: '12:00:00', horaFinCharla: '13:00:00', estadoCharla: 'ACTUALIZADA', idSala: 2 },
-  { idCharla: 3, nombreCharla: 'Git en equipo', descripcionCharla: 'Ramas, pull requests y resolución de conflictos.',
-    fechaCharla: '2026-11-25', horaInicioCharla: '09:30:00', horaFinCharla: '10:30:00', estadoCharla: 'CANCELADA', idSala: 1 },
-  { idCharla: 4, nombreCharla: 'Seguridad web', descripcionCharla: 'XSS, CSRF e inyección SQL.',
-    fechaCharla: '2026-12-02', horaInicioCharla: '16:00:00', horaFinCharla: '17:30:00', estadoCharla: 'PROGRAMADA', idSala: 3 },
-];
+import { CHARLAS } from './datosCharlas';
 
 const DIAS_SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 const hhmm = (t) => t.slice(0, 5);
@@ -22,10 +9,17 @@ const pad = (n) => String(n).padStart(2, '0');
 
 export default function Reserva() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Si llegamos desde Inicio con una charla elegida, la dejamos seleccionada
+  const charlaInicial = CHARLAS.find((c) => c.idCharla === location.state?.idCharla) ?? null;
 
   const [charlas] = useState(CHARLAS);
-  const [vista, setVista] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-  const [seleccionada, setSeleccionada] = useState(null); // objeto charla o null
+  const [vista, setVista] = useState(() => {
+    const base = charlaInicial ? new Date(charlaInicial.fechaCharla + 'T00:00') : new Date();
+    return new Date(base.getFullYear(), base.getMonth(), 1);
+  });
+  const [seleccionada, setSeleccionada] = useState(charlaInicial); // objeto charla o null
   const [mensaje, setMensaje] = useState('');
 
   // ¿Hay un usuario con sesión iniciada? (si no, es invitado)
