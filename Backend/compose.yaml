@@ -8,7 +8,8 @@ services:
     volumes:
       - ./app:/var/www/html
     depends_on:
-      - db
+      db:
+        condition: service_started
 
   db:
     image: mysql:8.4
@@ -22,18 +23,20 @@ services:
 
   frontend:
     build:
-      context: ../Frontend # carpeta de tu proyecto React (ajusta el nombre)
-      target: dev # cambia a "prod" para servirlo con Nginx
+      context: ../frontend
+      dockerfile: dockerfile
+      target: dev
     ports:
-      - "127.0.0.1:5173:5173" # en prod: "127.0.0.1:3000:80"
+      - "127.0.0.1:5173:5173"
     volumes:
-      - ../Frontend:/app
-      - /app/node_modules # conserva los node_modules del contenedor
+      - ../frontend:/app
+      - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
       - VITE_PROXY_TARGET=http://web:80
     depends_on:
-      - web
+      web:
+        condition: service_started
 
 volumes:
   mysql_data:

@@ -14,10 +14,35 @@ export function obtenerMisReservas(idUsuario) {
 
 /** Guarda una reserva en la base de datos (tabla Reserva). */
 export function reservarCharla(idUsuario, idCharla) {
-  return peticion("/mis-reservas", { method: "POST", body: { idUsuario, idCharla } });
+  return peticion("/mis-reservas", {
+    method: "POST",
+    body: { idUsuario, idCharla },
+  });
 }
 
 /** Guarda la asistencia a una reserva (tabla Asistencia). */
 export function confirmarAsistenciaReserva(idUsuario, idReserva) {
-  return peticion(`/mis-reservas/${idReserva}/asistencia`, { method: "POST", body: { idUsuario } });
+  return peticion(`/mis-reservas/${idReserva}/asistencia`, {
+    method: "POST",
+    body: { idUsuario },
+  });
+}
+
+/**
+ * Todas las charlas próximas (programadas y canceladas, desde hoy), ordenadas por fecha y hora.
+ * El backend las devuelve paginadas: se piden páginas de 100 hasta tenerlas todas.
+ */
+export async function obtenerProximasCharlas() {
+  const charlas = [];
+  let pagina = 1;
+  let ultimaPagina;
+
+  do {
+    const respuesta = await peticion(`/charlas?per_page=100&page=${pagina}`);
+    charlas.push(...respuesta.data);
+    ultimaPagina = respuesta.last_page;
+    pagina += 1;
+  } while (pagina <= ultimaPagina);
+
+  return charlas;
 }

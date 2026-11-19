@@ -37,7 +37,7 @@ class CharlasDemoSeeder extends Seeder
 
         // Fechas relativas a hoy para que siempre haya charlas visibles y reservables
         $charlas = [
-            ['Introducción a Laravel', 'Rutas, controladores y Eloquent.',        today(),                       '10:00', '11:30', $salaA, 30, 'programada'],
+            ['Introducción a React', 'Rutas, controladores y Eloquent.',        today(),                       '10:00', '11:30', $salaA, 30, 'programada'],
             ['MySQL avanzado',         'Índices, joins y optimización.',           today(),                       '12:00', '13:00', $salaB, 20, 'programada'],
             ['Seguridad web',          'XSS, CSRF e inyección SQL.',               today()->addDays(7),           '16:00', '17:30', $salaA, 2,  'programada'],
             ['Git en equipo',          'Ramas, pull requests y conflictos.',       today()->addDays(3),           '09:30', '10:30', $salaA, 30, 'cancelada'],

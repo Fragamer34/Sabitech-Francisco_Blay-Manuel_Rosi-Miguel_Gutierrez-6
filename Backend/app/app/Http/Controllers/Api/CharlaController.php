@@ -12,16 +12,22 @@ use Illuminate\Validation\Rule;
 class CharlaController extends Controller
 {
     /**
-     * Catálogo público: charlas programadas, con ponente, sala y plazas libres (paginado).
+     * Catálogo público: charlas próximas (programadas y canceladas, desde hoy), con ponente,
+     * sala y plazas libres. Paginado: 10 por página, o los que indique ?per_page= (máximo 100).
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
+        $datos = $request->validate([
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+        ]);
+
         $charlas = Charla::with(['ponente', 'sala'])
             ->conReservasConfirmadas()
-            ->where('estadoCharla', 'programada')
+            ->whereIn('estadoCharla', ['programada', 'cancelada'])
+            ->whereDate('fechaCharla', '>=', Carbon::today())
             ->orderBy('fechaCharla')
             ->orderBy('horaInicioCharla')
-            ->paginate(10);
+            ->paginate($datos['per_page'] ?? 10);
 
         return response()->json($charlas->through(fn (Charla $charla) => $this->formato($charla)));
     }

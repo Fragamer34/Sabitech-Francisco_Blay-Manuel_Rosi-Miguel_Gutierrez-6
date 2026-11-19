@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CHARLAS } from './datosCharlas';
+import { obtenerProximasCharlas } from '../api/reservaApi';
 
 const ETIQUETAS_ESTADO = {
   PROGRAMADA: 'Programada',
@@ -17,8 +18,34 @@ const formatearFecha = (fecha) =>
 export default function Inicio() {
   const navigate = useNavigate();
 
+  // Charlas de la base de datos (tabla Charla), con el formato que usa esta pantalla
+  const [charlasBD, setCharlasBD] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerProximasCharlas()
+      .then((lista) => {
+        if (cancelado) return;
+        setCharlasBD(lista.map((c) => ({
+          idCharla: c.idCharla,
+          nombreCharla: c.tituloCharla,
+          descripcionCharla: c.contenidoCharla ?? '',
+          fechaCharla: c.fechaCharla,
+          horaInicioCharla: c.horaInicioCharla,
+          horaFinCharla: c.horaFinCharla,
+          idSala: c.idSala,
+          estadoCharla: c.estadoCharla.toUpperCase(),
+        })));
+      })
+      .catch((err) => { if (!cancelado) setError(err.message); })
+      .finally(() => { if (!cancelado) setCargando(false); });
+    return () => { cancelado = true; };
+  }, []);
+
   // Charlas ordenadas por fecha y hora de inicio
-  const charlas = [...CHARLAS].sort((a, b) =>
+  const charlas = [...charlasBD].sort((a, b) =>
     `${a.fechaCharla}${a.horaInicioCharla}`.localeCompare(`${b.fechaCharla}${b.horaInicioCharla}`));
 
   // Va a Reserva.jsx con la charla elegida para que aparezca seleccionada
@@ -42,7 +69,9 @@ export default function Inicio() {
           Consulta el calendario de charlas y reserva tu plaza. Para reservar, inicia sesión o crea una cuenta.
         </p>
 
-        {charlas.length === 0 && <p className="muted">No hay charlas programadas.</p>}
+        {cargando && <p className="muted">Cargando charlas…</p>}
+        {!cargando && error && <p className="error">No se pudieron cargar las charlas. {error}</p>}
+        {!cargando && !error && charlas.length === 0 && <p className="muted">No hay charlas programadas.</p>}
 
         <ul className="lista-charlas">
           {charlas.map((c) => {
