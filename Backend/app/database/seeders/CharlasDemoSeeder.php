@@ -10,7 +10,7 @@ use Illuminate\Database\Seeder;
 /**
  * Datos de prueba para el calendario: 1 ponente, 2 salas y 4 charlas en el mes actual.
  * Se puede ejecutar varias veces sin duplicar nada:
- *   php artisan db:seed --class=CharlasDemoSeeder
+ *  docker compose exec web php artisan db:seed --class=CharlasDemoSeeder
  */
 class CharlasDemoSeeder extends Seeder
 {
@@ -41,6 +41,11 @@ class CharlasDemoSeeder extends Seeder
             ['MySQL avanzado',         'Índices, joins y optimización.',           today(),                       '12:00', '13:00', $salaB, 20, 'programada'],
             ['Seguridad web',          'XSS, CSRF e inyección SQL.',               today()->addDays(7),           '16:00', '17:30', $salaA, 2,  'programada'],
             ['Git en equipo',          'Ramas, pull requests y conflictos.',       today()->addDays(3),           '09:30', '10:30', $salaA, 30, 'cancelada'],
+            ['Git en equipo',          'Ramas, pull requests y conflictos.',       today()->addDays(3),           '09:30', '10:30', $salaA, 30, 'cancelada'],
+            ['Docker para desarrolladores', 'Contenedores, imágenes y Docker Compose.', today()->addDays(6), '16:00', '17:30', $salaB, 25, 'programada'],
+            ['Introducción a GitHub', 'Repositorios, commits y colaboración en equipo.', today()->addDays(6), '17:45', '18:45', $salaA, 30, 'programada'],
+            ['Bases de datos relacionales', 'Diseño de tablas, relaciones y claves foráneas.', today()->addDays(7), '10:45', '12:00', $salaB, 25, 'programada'],
+            ['APIs REST con PHP', 'Creación y consumo de servicios REST.', today()->addDays(7), '12:15', '13:30', $salaA, 20, 'programada']
         ];
 
         foreach ($charlas as [$titulo, $contenido, $fecha, $inicio, $fin, $sala, $aforo, $estado]) {

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * Reservas y asistencia de un usuario. No usa tokens: el frontend envía el idUsuario
+ * Reservas y asistencia de un usuario. El frontend envía el idUsuario
  * del usuario que ha iniciado sesión y aquí solo se comprueba que ese usuario existe.
  */
 class MisReservasController extends Controller

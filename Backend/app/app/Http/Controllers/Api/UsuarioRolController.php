@@ -9,13 +9,11 @@ use Illuminate\Validation\Rule;
 
 /**
  * Tabla intermedia con clave primaria compuesta (idUsuario, idRol).
- * No tiene más columnas, así que no hay "update": se asigna o se quita un rol.
  */
 class UsuarioRolController extends Controller
 {
     /**
      * Listado de asignaciones usuario-rol (paginado).
-     * Filtros opcionales: ?idUsuario=1&idRol=2
      */
     public function index(Request $request)
     {

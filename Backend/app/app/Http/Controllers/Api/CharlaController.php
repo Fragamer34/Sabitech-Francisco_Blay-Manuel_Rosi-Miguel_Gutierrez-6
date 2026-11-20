@@ -13,7 +13,7 @@ class CharlaController extends Controller
 {
     /**
      * Catálogo público: charlas próximas (programadas y canceladas, desde hoy), con ponente,
-     * sala y plazas libres. Paginado: 10 por página, o los que indique ?per_page= (máximo 100).
+     * sala y plazas libres.
      */
     public function index(Request $request): JsonResponse
     {

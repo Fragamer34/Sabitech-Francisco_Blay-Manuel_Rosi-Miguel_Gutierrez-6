@@ -2,7 +2,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// El proxy reenvía /api al backend. En tu PC es localhost:8080 (puerto que publica Docker);
+// El proxy reenvía /api al backend. En este caso localhost:8080 (puerto que publica Docker);
 // dentro de Docker Compose se usa VITE_PROXY_TARGET=http://web:80 (ver Backend/compose.yaml).
 const destinoApi = process.env.VITE_PROXY_TARGET || 'http://localhost:8080'
 

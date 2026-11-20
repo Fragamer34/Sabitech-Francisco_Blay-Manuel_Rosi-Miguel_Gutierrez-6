@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 /**
- * Reservas del usuario identificado. El usuario sale del token, nunca del cuerpo de la petición.
+ * Reservas del usuario identificado.
  */
 class MisReservasController extends Controller
 {

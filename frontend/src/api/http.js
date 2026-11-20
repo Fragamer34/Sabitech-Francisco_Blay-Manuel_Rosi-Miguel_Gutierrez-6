@@ -25,7 +25,7 @@ export async function peticion(ruta, { method = "GET", body } = {}) {
   try {
     json = JSON.parse(texto);
   } catch {
-    // La respuesta no es JSON (por ejemplo, una página HTML)
+    // La respuesta no es JSON
   }
 
   if (!respuesta.ok) {
