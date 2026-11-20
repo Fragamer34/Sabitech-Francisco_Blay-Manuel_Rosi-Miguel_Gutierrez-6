@@ -1,0 +1,47 @@
+CREATE TABLE Usuario (idUsuario INT PRIMARY KEY AUTO_INCREMENT,
+nombreUsuario VARCHAR(50) NOT NULL,
+apellidosUsuario VARCHAR(200) NOT NULL,
+emailUsuario VARCHAR(200) UNIQUE NOT NULL,
+contrasenaUsuario_has VARCHAR(50) NOT NULL,
+fechaDeRegistroUsuario DATE NOT NULL DEFAULT CURRENT_DATE);
+
+CREATE TABLE Rol ( idRoles INT PRIMARY KEY AUTO_INCREMENT,
+tipoRol ENUM ('ADMIN','ASISTENTE','INVITADO','PONENTE')  NOT NULL DEFAULT ('ASISTENTE'),
+idUsuario INT NOT NULL,
+foreign key (idUsuario) references usuario (idUsuario)
+on update cascade
+on delete restrict);
+
+CREATE TABLE Sala (idSala INT PRIMARY KEY AUTO_INCREMENT,
+nombreSala VARCHAR(50) NOT NULL,
+ubicacionSala VARCHAR(50) NOT NULL,
+capacidadSala INT NOT NULL);
+
+CREATE TABLE Charla (idCharla INT PRIMARY KEY AUTO_INCREMENT,
+nombreCharla VARCHAR(50) NOT NULL,
+descripcionCharla VARCHAR (max) NOT NULL,
+fechaCharla DATE NOT NULL,
+horaInicioCharla TIME NOT NULL,
+horaFinCharla TIME NOT NULL,
+estadoCharla ENUM ('PROGRAMADA','ACTUALIZADA','CANCELADA') NOT NULL DEFAULT ('PROGRAMADA'),
+asistenciaCharla ENUM ('HA ASISTIDO','NO HA ASISTIDO','ASISTENCIA NO REVISADA') NOT FULL DEFAULT ('ASISTENCIA NO REVISADA'),
+idUsuario int NOT NULL,
+idSala int NOT NULL,
+foreign key (idUsuario) references usuario (idUsuario)
+on update cascade
+on delete restrict,
+foreign key (idSala) references Sala (idSala)
+on update cascade
+on delete restrict);
+
+CREATE TABLE Reserva (idReservas INT PRIMARY KEY AUTO_INCREMENT,
+idUsuario INT NOT NULL,
+idCharla INT NOT NULL,
+fechaReserva DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP),
+estadoReserva ENUM ('ACTIVA','ANULADA') NOT NULL DEFAULT ('ACTIVA'),
+foreign key (idUsuario) references Usuario (idUsuario)
+on update cascade
+on delete restrict),
+foreign key (idCharla) references Charla (idCharla)
+on update cascade
+on delete restrict);
